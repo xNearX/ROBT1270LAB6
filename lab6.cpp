@@ -175,6 +175,7 @@ bool setCyclePenColors(char *strLine); // Parses line string to send a CYCLE_PEN
 
 void processCommand(int commandIndex, char *strLine, double TM[3][3]); // processes a command string from the file
 int getCommandIndex(const char *strLine);                              // gets the command keyword index from a string
+bool setPenColor(const char *strLine);
 
 double getQuadraticBezierArcLength(TOOL_POSITION P0, TOOL_POSITION P1, TOOL_POSITION P2); // calc Bezier curve length
 void resetTransformMatrix(double TM[][3]);                        // resets the transform matrix to the identity matrix
@@ -255,6 +256,17 @@ void processFileCommands()
       makeStringUpperCase(strLine);  // make line string all upper case (makes commands case-insensitive)
 
       //**** YOUR CODE FOR getCommandIndex and processCommand GOES HERE ****
+      commandIndex = getCommandIndex(strLine);
+      if(commandIndex != COMMAND_INDEX_NOT_FOUND)
+      {
+         processCommand(commandIndex, strLine, TM);
+      }
+      else
+      {
+         printf("Command not found\n");
+      }
+     
+
    }
    fclose(fi);
    fclose(flog);
@@ -300,7 +312,7 @@ void processCommand(int commandIndex, char *strCommandLine, double TM[3][3])
          robotAngles(&homeAngles, UPDATE_CURRENT_ANGLES);
          break;
       case PEN_COLOR:
-         //*** ADD CODE ***
+         bSuccess = setPenColor(strCommandLine);
          break;
       case CYCLE_PEN_COLORS:
          bSuccess = setCyclePenColors(strCommandLine);
@@ -660,3 +672,39 @@ size_t getNumPathPoints(double len, int resolution)
    return NP;
 }
 
+int getCommandIndex(const char *strLine)
+{
+   char *tok = NULL, *nextTok = NULL;
+   char strLineCopy[MAX_LINE_SIZE];
+
+   if(strLine == NULL || strlen(strLine) == 0)
+   {
+      return BLANK_LINE;
+   }
+
+   strcpy_s(strLineCopy, MAX_LINE_SIZE, strLine);
+   tok = strtok_s(strLineCopy, seps, &nextTok);
+
+   if(tok == NULL)
+   {
+      return COMMAND_INDEX_NOT_FOUND;
+   }
+
+   for(int i = 0; i < NUM_COMMANDS; i++)
+   {
+      if(strcmp(tok, m_Commands[i].strCommand) == 0)
+      {
+         return m_Commands[i].index;
+      }
+   }
+   return COMMAND_INDEX_NOT_FOUND;
+}
+
+bool setPenColor(const char *strLine)
+{
+   char *tok = NULL, *nextTok = NULL;
+   char strLineCopy[MAX_LINE_SIZE];
+
+
+
+}
